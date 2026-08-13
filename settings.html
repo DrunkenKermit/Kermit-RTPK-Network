@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kermit (RTPK) Network — Settings</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/theme.js" defer></script>
+  <script src="assets/animation.js" defer></script>
+  <script src="assets/cursor.js" defer></script>
+  <script src="assets/nav.js" defer></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const selectActive = (selector, value, attribute) => {
+        document.querySelectorAll(selector).forEach((button) => {
+          button.classList.toggle("active", button.dataset[attribute] === value);
+        });
+      };
+
+      const cursorContainer = document.getElementById("cursorOptions");
+      if (cursorContainer && window.getKermitCursor) {
+        selectActive(".cursor-option-btn", window.getKermitCursor(), "cursor");
+        cursorContainer.querySelectorAll(".cursor-option-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            window.applyKermitCursor(btn.dataset.cursor);
+            selectActive(".cursor-option-btn", btn.dataset.cursor, "cursor");
+          });
+        });
+      }
+
+      const animContainer = document.getElementById("animLevelOptions");
+      if (animContainer && window.getKermitAnimLevel) {
+        selectActive(".anim-level-btn", window.getKermitAnimLevel(), "level");
+        animContainer.querySelectorAll(".anim-level-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            window.applyKermitAnimLevel(btn.dataset.level);
+            selectActive(".anim-level-btn", btn.dataset.level, "level");
+          });
+        });
+      }
+
+      const backgroundContainer = document.getElementById("backgroundOptions");
+      const swatchLabel = document.getElementById("activeSwatchLabel");
+      const highlightBackground = (name) => {
+        selectActive(".background-option", name, "name");
+        if (swatchLabel) swatchLabel.textContent = name;
+      };
+      if (backgroundContainer && window.kermitBackgroundOptions) {
+        window.kermitBackgroundOptions.forEach((option) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "background-option";
+          btn.dataset.name = option.name;
+          btn.textContent = option.name;
+          btn.style.background = option.value;
+          btn.addEventListener("click", () => {
+            window.applyKermitBackground(option.name);
+            highlightBackground(option.name);
+          });
+          backgroundContainer.appendChild(btn);
+        });
+        highlightBackground(window.getActiveKermitBackground());
+      }
+
+      const preferences = window.getKermitSitePreferences();
+      selectActive(".nav-option-btn", preferences.navigation, "navigation");
+      document.querySelectorAll(".nav-option-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          window.applyKermitNavigation(btn.dataset.navigation);
+          selectActive(".nav-option-btn", btn.dataset.navigation, "navigation");
+        });
+      });
+
+      const siteName = document.getElementById("siteNameInput");
+      const siteIcon = document.getElementById("siteIconInput");
+      const identityForm = document.getElementById("identityForm");
+      if (siteName && siteIcon) {
+        siteName.value = preferences.siteName;
+        siteIcon.value = preferences.siteIcon;
+      }
+      identityForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        window.applyKermitSiteIdentity(siteName.value, siteIcon.value);
+        const status = document.getElementById("identityStatus");
+        if (status) {
+          status.textContent = "Identity saved.";
+          status.classList.add("visible");
+          setTimeout(() => status.classList.remove("visible"), 3500);
+        }
+      });
+      document.getElementById("resetIdentity")?.addEventListener("click", () => {
+        window.resetKermitSiteIdentity();
+        siteName.value = "";
+        siteIcon.value = "";
+        const status = document.getElementById("identityStatus");
+        if (status) {
+          status.textContent = "Back to the default site identity.";
+          status.classList.add("visible");
+          setTimeout(() => status.classList.remove("visible"), 3500);
+        }
+      });
+
+      const cloakMode = preferences.cloakMode;
+      selectActive(".cloak-option-btn", cloakMode, "cloak");
+      document.querySelectorAll(".cloak-option-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          window.setKermitCloakMode(btn.dataset.cloak);
+          selectActive(".cloak-option-btn", btn.dataset.cloak, "cloak");
+        });
+      });
+      document.getElementById("launchCloak")?.addEventListener("click", async () => {
+        const status = document.getElementById("cloakStatus");
+        try {
+          const launchedAs = await window.launchKermitCloak(window.getKermitCloakMode());
+          if (status) {
+            status.textContent = launchedAs === "normal"
+              ? "Opened a regular new tab."
+              : `Opened this site as ${launchedAs}.`;
+            status.classList.add("visible");
+          }
+        } catch (error) {
+          if (status) {
+            status.textContent = error.message;
+            status.classList.add("visible");
+          }
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar">
+    <pre class="sidebar-kermit-logo" aria-label="Kermit RTPK Network">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠔⠒⡶⡷⠀⠁⠵⡄⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠠⢶⣶⣦⡄⢀⠤⢔⠘⠓⠉⠀⠀⠑⠦⠤⠤⠞⠪⡂⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡰⠁⠀⠉⠛⠿⣆⣽⠶⠤⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠀⠀⠀
+⠀⠀⠰⠁⠀⠀⠀⠀⠠⠃⠈⢧⠠⠠⣦⣍⣍⣝⠛⠾⠾⢂⣤⣤⣾⡆⠀⠀⠀⠀
+⠀⠀⡆⠀⠀⠀⠀⡐⠁⠀⠀⠀⠱⡀⠀⠀⠀⣀⣠⣤⣾⣿⣿⣿⣿⡇⠀⠀⠀⠀
+⠀⠀⡗⢤⡀⡠⠊⠀⠀⠀⠀⠀⠀⠈⠢⡀⠙⠻⠛⠛⣟⣿⣿⣿⣿⡇⠀⠀⠀⠀
+⠀⠀⠀⣸⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢟⣤⢠⣄⡔⡊⠛⠻⣿⣿⡇⠀⠀⠀⠀
+⠀⢀⢀⣾⠻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣮⣆⠻⣿⣿⣧⣤⣌⣻⡇⠀⠀⠀⠀
+⠀⢸⡸⣿⠨⡀⠀⠀⠀⠀⠀⠀⠀⢀⡠⡮⠋⠉⠻⡓⠮⠛⠛⠻⠿⢧⡀⠀⠀⠀
+⠀⠀⢷⡞⠓⠒⠬⠥⠤⠄⠤⠠⢝⣆⡾⠃⣠⣾⠀⠀⣰⡀⠀⠀⣆⠀⢻⣦⠀⠀
+⣿⣿⣿⣿⣶⣤⡤⣄⣀⣐⣀⣤⣮⢊⢀⡼⠋⠀⠀⡰⠁⣇⠀⡸⢹⣇⠀⣿⣧⣤
+⠽⢿⠿⠿⢿⣿⣿⣿⣿⣿⣿⡟⠁⣤⠎⠀⠀⡄⡼⠃⠀⢺⣠⣷⣄⣈⠁⠻⣿⠛</pre>
+    <a class="sidebar-tab" href="index.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <a class="sidebar-tab" href="games.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+      Games
+    </a>
+    <a class="sidebar-tab" href="movies.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+      Movies &amp; Shows
+    </a>
+    <a class="sidebar-tab active sidebar-tab-settings" href="settings.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+  <main class="page page-panel settings-page">
+    <div class="settings-header">
+      <h1>Settings</h1>
+      <hr class="page-rule" />
+      <p class="page-tagline">Tailor your Kermit experience</p>
+      <p>Change the look, navigation, identity, and launch behavior of the site.</p>
+    </div>
+    <section class="settings-panel">
+      <div class="settings-panel-heading">
+        <h2>Theme &amp; Colors</h2>
+        <span class="active-swatch">
+          <span class="active-swatch-dot" id="activeSwatchDot"></span>
+          <span id="activeSwatchLabel">Default Kermit Glow</span>
+        </span>
+      </div>
+      <p class="settings-panel-hint">Pick a background to recolor the site, including the pond scene on the home page.</p>
+      <div class="background-options" id="backgroundOptions"></div>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-panel-heading">
+        <h2>Navigation</h2>
+        <span class="settings-panel-kicker">Choose a layout</span>
+      </div>
+      <div class="settings-choice-grid nav-options">
+        <button class="nav-option-btn" type="button" data-navigation="vertical">
+          <span class="settings-choice-icon">▥</span>
+          <span class="settings-choice-copy"><strong>Vertical</strong><small>Side navigation with icons and labels</small></span>
+        </button>
+        <button class="nav-option-btn" type="button" data-navigation="horizontal">
+          <span class="settings-choice-icon">▤</span>
+          <span class="settings-choice-copy"><strong>Horizontal</strong><small>Top navigation with icons and labels</small></span>
+        </button>
+      </div>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-panel-heading">
+        <h2>Site identity</h2>
+        <span class="settings-panel-kicker">Browser tab</span>
+      </div>
+      <form class="identity-form" id="identityForm">
+        <label><span>Site name</span><input id="siteNameInput" type="text" maxlength="80" placeholder="Kermit (RTPK) Network" /></label>
+        <label><span>Icon URL</span><input id="siteIconInput" type="url" placeholder="https://example.com/icon.png" /></label>
+        <div class="identity-actions">
+          <button class="settings-save-btn" type="submit">Save identity</button>
+          <button class="settings-reset-btn" id="resetIdentity" type="button">Reset</button>
+        </div>
+      </form>
+      <p class="settings-status" id="identityStatus" role="status"></p>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-panel-heading">
+        <h2>Tab cloaking</h2>
+        <span class="settings-panel-kicker">Optional launch mode</span>
+      </div>
+      <p class="settings-panel-hint">Open the current page in a new tab with a less obvious URL. Some browsers may block new tabs.</p>
+      <div class="settings-choice-grid cloak-options">
+        <button class="cloak-option-btn" type="button" data-cloak="none"><strong>Normal</strong><small>Use the regular site URL</small></button>
+        <button class="cloak-option-btn" type="button" data-cloak="blob"><strong>Blob URL</strong><small>Launch as a temporary blob URL</small></button>
+        <button class="cloak-option-btn" type="button" data-cloak="aboutblank"><strong>about:blank</strong><small>Launch inside a blank tab</small></button>
+      </div>
+      <div class="settings-action-row">
+        <button class="settings-save-btn" id="launchCloak" type="button">Launch selected mode</button>
+        <p class="settings-status" id="cloakStatus" role="status"></p>
+      </div>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-panel-heading">
+        <h2>Custom Cursor</h2>
+      </div>
+      <p class="settings-panel-hint">Choose a cursor style to use across the site.</p>
+      <div class="cursor-options" id="cursorOptions">
+        <button class="cursor-option-btn" data-cursor="custom">
+          <span class="cursor-option-preview cursor-preview-custom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 34 34">
+              <defs>
+                <linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#ff6ec7"/>
+                  <stop offset="33%"  stop-color="#63ff93"/>
+                  <stop offset="66%"  stop-color="#63d4ff"/>
+                  <stop offset="100%" stop-color="#ffe566"/>
+                </linearGradient>
+              </defs>
+              <path d="M4 2 L4 26 L10 20 L15 30 L19.5 28 L14.5 18 L24 18 Z"
+                    fill="url(#cg)" stroke="rgba(0,0,0,0.35)" stroke-width="1.3"
+                    stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="cursor-option-name">Custom</span>
+          <span class="cursor-option-desc">Color-changing cursor that matches your theme</span>
+          <span class="cursor-option-badge">Primary</span>
+        </button>
+        <button class="cursor-option-btn" data-cursor="default">
+          <span class="cursor-option-preview cursor-preview-default">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 34 34">
+              <defs>
+                <linearGradient id="dg" x1="8%" y1="6%" x2="88%" y2="94%">
+                  <stop offset="0%"   stop-color="#e0e0e0"/>
+                  <stop offset="100%" stop-color="#888888"/>
+                </linearGradient>
+              </defs>
+              <path d="M4 2 L4 26 L10 20 L15 30 L19.5 28 L14.5 18 L24 18 Z"
+                    fill="url(#dg)" stroke="rgba(0,0,0,0.35)" stroke-width="1.3"
+                    stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="cursor-option-name">Default</span>
+          <span class="cursor-option-desc">Your system's standard cursor</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-panel-heading">
+        <h2>Animation Intensity</h2>
+      </div>
+      <p class="settings-panel-hint">Choose how much motion runs across the site.</p>
+      <div class="anim-level-options" id="animLevelOptions">
+        <button class="anim-level-btn" data-level="full">
+          <span class="anim-level-icon">✦</span>
+          <span class="anim-level-name">Full</span>
+          <span class="anim-level-desc">Rain, fireflies, dragonflies &amp; ripples</span>
+        </button>
+        <button class="anim-level-btn" data-level="reduced">
+          <span class="anim-level-icon">◈</span>
+          <span class="anim-level-name">Reduced</span>
+          <span class="anim-level-desc">Rain &amp; ripples only — no fireflies or dragonflies</span>
+        </button>
+        <button class="anim-level-btn" data-level="off">
+          <span class="anim-level-icon">◯</span>
+          <span class="anim-level-name">Off</span>
+          <span class="anim-level-desc">Static pond scene — no animations</span>
+        </button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

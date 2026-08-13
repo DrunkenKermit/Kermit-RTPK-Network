@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kermit (RTPK) Network</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/theme.js" defer></script>
+  <script src="assets/animation.js" defer></script>
+  <script src="assets/cursor.js" defer></script>
+  <script src="assets/nav.js" defer></script>
+  <script defer>
+    const messages = [
+      "Your Website for everything games, browsing, movies & shows",
+      "Get Better soon Jaiden ❤️",
+      "Kermit was here",
+      "when will you learn to port? 🤓",
+      "If you read this your gay 🥀",
+      "frog 🐸🗣️🔥",
+      "SPED CENTRAL😜😜🔥",
+      "I love Devvy ❤️",
+      "what are you waiting for? do something😭🥀"
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const el = document.getElementById("shuffleText");
+      let index = 0;
+
+      const showNext = () => {
+        el.classList.add("fade-out");
+        setTimeout(() => {
+          index = (index + 1) % messages.length;
+          el.textContent = messages[index];
+          el.classList.remove("fade-out");
+        }, 400);
+      };
+
+      setInterval(showNext, 10000);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const scene = document.getElementById("rainScene");
+      if (!scene) return;
+      const dropCount = 46;
+      const frag = document.createDocumentFragment();
+      const dropTimings = [];
+      for (let i = 0; i < dropCount; i++) {
+        const drop = document.createElement("span");
+        drop.className = "raindrop";
+        const left = Math.random() * 100;
+        const duration = 0.7 + Math.random() * 0.6;
+        const delay = Math.random() * 3;
+        const height = 14 + Math.random() * 16;
+        drop.style.left = left + "%";
+        drop.style.animationDuration = duration.toFixed(2) + "s";
+        drop.style.animationDelay = delay.toFixed(2) + "s";
+        drop.style.height = height + "px";
+        frag.appendChild(drop);
+        dropTimings.push({ left, duration, delay });
+      }
+      scene.appendChild(frag);
+
+      const pond = scene.querySelector(".pond");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!pond || reduceMotion) return;
+
+      const pondLeftPercent = 50;
+      const pondHalfWidthPercent = 25;
+
+      const getRandomPosition = () => {
+        const x = 10 + Math.random() * 80;
+        const y = 10 + Math.random() * 80;
+        return { x, y };
+      };
+
+      const spawnRippleAt = () => {
+        const { x, y } = getRandomPosition();
+        const ripple = document.createElement("span");
+        ripple.className = "pond-ripple-drop";
+        ripple.style.left = x + "%";
+        ripple.style.top = y + "%";
+        pond.appendChild(ripple);
+        ripple.addEventListener("animationend", () => ripple.remove());
+        setTimeout(() => ripple.remove(), 2000);
+      };
+
+      dropTimings.forEach(({ left, duration, delay }) => {
+        if (left < pondLeftPercent - pondHalfWidthPercent || left > pondLeftPercent + pondHalfWidthPercent) {
+          return;
+        }
+        const landDelay = (delay + duration * 0.92) * 1000;
+        setTimeout(() => spawnRippleAt(), landDelay);
+        const cycleMs = (duration + 3) * 1000;
+        setInterval(() => spawnRippleAt(), cycleMs);
+      });
+    });
+  </script>
+</head>
+<body>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <nav class="sidebar">
+    <pre class="sidebar-kermit-logo" aria-label="Kermit RTPK Network">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠔⠒⡶⡷⠀⠁⠵⡄⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠠⢶⣶⣦⡄⢀⠤⢔⠘⠓⠉⠀⠀⠑⠦⠤⠤⠞⠪⡂⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡰⠁⠀⠉⠛⠿⣆⣽⠶⠤⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠀⠀⠀
+⠀⠀⠰⠁⠀⠀⠀⠀⠠⠃⠈⢧⠠⠠⣦⣍⣍⣝⠛⠾⠾⢂⣤⣤⣾⡆⠀⠀⠀⠀
+⠀⠀⡆⠀⠀⠀⠀⡐⠁⠀⠀⠀⠱⡀⠀⠀⠀⣀⣠⣤⣾⣿⣿⣿⣿⡇⠀⠀⠀⠀
+⠀⠀⡗⢤⡀⡠⠊⠀⠀⠀⠀⠀⠀⠈⠢⡀⠙⠻⠛⠛⣟⣿⣿⣿⣿⡇⠀⠀⠀⠀
+⠀⠀⠀⣸⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢟⣤⢠⣄⡔⡊⠛⠻⣿⣿⡇⠀⠀⠀⠀
+⠀⢀⢀⣾⠻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣮⣆⠻⣿⣿⣧⣤⣌⣻⡇⠀⠀⠀⠀
+⠀⢸⡸⣿⠨⡀⠀⠀⠀⠀⠀⠀⠀⢀⡠⡮⠋⠉⠻⡓⠮⠛⠛⠻⠿⢧⡀⠀⠀⠀
+⠀⠀⢷⡞⠓⠒⠬⠥⠤⠄⠤⠠⢝⣆⡾⠃⣠⣾⠀⠀⣰⡀⠀⠀⣆⠀⢻⣦⠀⠀
+⣿⣿⣿⣿⣶⣤⡤⣄⣀⣐⣀⣤⣮⢊⢀⡼⠋⠀⠀⡰⠁⣇⠀⡸⢹⣇⠀⣿⣧⣤
+⠽⢿⠿⠿⢿⣿⣿⣿⣿⣿⣿⡟⠁⣤⠎⠀⠀⡄⡼⠃⠀⢺⣠⣷⣄⣈⠁⠻⣿⠛</pre>
+    <a class="sidebar-tab active" href="index.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <a class="sidebar-tab" href="games.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+      Games
+    </a>
+    <a class="sidebar-tab" href="movies.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+      Movies &amp; Shows
+    </a>
+    <a class="sidebar-tab sidebar-tab-settings" href="settings.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+  <main class="page page-home">
+    <div class="rain-scene" id="rainScene" aria-hidden="true">
+      <div class="pond-surrounds">
+        <span class="cattail cattail-1"><span class="cattail-head"></span></span>
+        <span class="cattail cattail-2"><span class="cattail-head"></span></span>
+        <span class="cattail cattail-3"><span class="cattail-head"></span></span>
+        <span class="cattail cattail-4"><span class="cattail-head"></span></span>
+        <span class="cattail cattail-5"><span class="cattail-head"></span></span>
+        <span class="cattail cattail-6"><span class="cattail-head"></span></span>
+        <span class="reed reed-1"></span>
+        <span class="reed reed-2"></span>
+        <span class="reed reed-3"></span>
+        <span class="reed reed-4"></span>
+        <span class="reed reed-5"></span>
+        <span class="reed reed-6"></span>
+        <span class="reed reed-7"></span>
+        <span class="reed reed-8"></span>
+        <span class="reed reed-9"></span>
+        <span class="reed reed-10"></span>
+        <span class="reed reed-11"></span>
+        <span class="pond-grass pond-grass-1"></span>
+        <span class="pond-grass pond-grass-2"></span>
+        <span class="pond-grass pond-grass-3"></span>
+        <span class="pond-grass pond-grass-4"></span>
+        <span class="pond-grass pond-grass-5"></span>
+        <span class="pond-grass pond-grass-6"></span>
+        <span class="fern fern-1"></span>
+        <span class="fern fern-2"></span>
+        <span class="fern fern-3"></span>
+        <span class="fern fern-4"></span>
+        <span class="firefly firefly-1"></span>
+        <span class="firefly firefly-2"></span>
+        <span class="firefly firefly-3"></span>
+        <span class="firefly firefly-4"></span>
+        <span class="firefly firefly-5"></span>
+        <span class="firefly firefly-6"></span>
+        <span class="firefly firefly-7"></span>
+        <span class="firefly firefly-8"></span>
+        <span class="dragonfly dragonfly-1"></span>
+        <span class="dragonfly dragonfly-2"></span>
+        <span class="dragonfly dragonfly-3"></span>
+        <div class="pond">
+          <span class="pond-ripple"></span>
+          <span class="pond-ripple pond-ripple-delay"></span>
+          <div class="lily-pad">
+            <span class="lily-pad-vein" style="transform: translate(-50%, -50%) rotate(20deg);"></span>
+            <span class="lily-pad-vein" style="transform: translate(-50%, -50%) rotate(75deg);"></span>
+            <span class="lily-pad-vein" style="transform: translate(-50%, -50%) rotate(130deg);"></span>
+            <span class="lily-pad-vein" style="transform: translate(-50%, -50%) rotate(185deg);"></span>
+            <span class="lily-pad-vein" style="transform: translate(-50%, -50%) rotate(245deg);"></span>
+            <div class="lily-flower">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-content">
+      <h1 class="glow-title">Kermit (RTPK) Network</h1>
+      <p class="subtitle" id="shuffleText">Your Website for everything Games, proxies and movies &amp; shows</p>
+    </div>
+  </main>
+</body>
+</html>
