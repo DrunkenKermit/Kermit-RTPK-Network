@@ -26,10 +26,79 @@
       const selectActive = (selector, value, attribute) => {
         document.querySelectorAll(selector).forEach((button) => {
           button.classList.toggle("active", button.dataset[attribute] === value);
+          button.setAttribute("aria-pressed", String(button.dataset[attribute] === value));
         });
       };
+      const status = document.getElementById("settingsStatus");
+      const announce = (message) => {
+        status.textContent = message;
+        status.classList.add("visible");
+        window.clearTimeout(announce.timer);
+        announce.timer = window.setTimeout(() => status.classList.remove("visible"), 2600);
+      };
 
-      /* remaining page scripts unchanged */
+      const backgrounds = document.getElementById("backgroundOptions");
+      window.kermitBackgroundOptions.forEach((option) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "background-option";
+        button.dataset.background = option.name;
+        button.style.backgroundImage = option.value;
+        button.innerHTML = `<span>${option.name}</span>`;
+        button.addEventListener("click", () => {
+          window.applyKermitBackground(option.name);
+          selectActive(".background-option", option.name, "background");
+          document.getElementById("activeBackgroundName").textContent = option.name;
+          announce("Background updated.");
+        });
+        backgrounds.appendChild(button);
+      });
+      const activeBackground = window.getActiveKermitBackground();
+      selectActive(".background-option", activeBackground, "background");
+      document.getElementById("activeBackgroundName").textContent = activeBackground;
+
+      document.querySelectorAll(".anim-level-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const level = window.applyKermitAnimLevel(button.dataset.animation);
+          selectActive(".anim-level-btn", level, "animation");
+          announce("Animation preference saved.");
+        });
+      });
+      selectActive(".anim-level-btn", window.getKermitAnimLevel(), "animation");
+
+      document.querySelectorAll(".nav-option-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const orientation = window.applyKermitNavigation(button.dataset.navigation);
+          selectActive(".nav-option-btn", orientation, "navigation");
+          announce("Taskbar layout saved.");
+        });
+      });
+      selectActive(".nav-option-btn", window.getKermitNavigation(), "navigation");
+
+      document.querySelectorAll(".cloak-option-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const mode = window.setKermitCloakMode(button.dataset.cloak);
+          selectActive(".cloak-option-btn", mode, "cloak");
+          announce("Cloak preference saved.");
+        });
+      });
+      selectActive(".cloak-option-btn", window.getKermitCloakMode(), "cloak");
+
+      const nameInput = document.getElementById("siteName");
+      const iconInput = document.getElementById("siteIcon");
+      const preferences = window.getKermitSitePreferences();
+      nameInput.value = preferences.siteName;
+      iconInput.value = preferences.siteIcon;
+      document.getElementById("saveIdentity").addEventListener("click", () => {
+        window.applyKermitSiteIdentity(nameInput.value, iconInput.value);
+        announce("Site identity saved.");
+      });
+      document.getElementById("resetIdentity").addEventListener("click", () => {
+        window.resetKermitSiteIdentity();
+        nameInput.value = "";
+        iconInput.value = "";
+        announce("Site identity reset.");
+      });
     });
   </script>
 </head>
@@ -39,14 +108,92 @@
   </button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <nav class="sidebar">
-    <pre class="sidebar-kermit-logo" aria-label="Kermit RTPK Network">...ascii art...</pre>
+    <pre class="sidebar-kermit-logo" aria-label="Kermit RTPK Network">K E R M I T
+R T P K</pre>
     <a class="sidebar-tab" href="/index.html">Home</a>
     <a class="sidebar-tab" href="/games.html">Games</a>
     <a class="sidebar-tab" href="/movies.html">Movies &amp; Shows</a>
     <a class="sidebar-tab active sidebar-tab-settings" href="/settings.html">Settings</a>
   </nav>
   <main class="page page-panel settings-page">
-    <!-- settings content unchanged -->
+    <header class="settings-header">
+      <p class="page-section-label">Control room</p>
+      <h1>Settings</h1>
+      <p>Personalize the Kermit Network. Changes are saved in this browser and apply across every page.</p>
+    </header>
+
+    <section class="settings-panel" aria-labelledby="backgroundHeading">
+      <div class="settings-panel-heading">
+        <div>
+          <h2 id="backgroundHeading">Atmosphere</h2>
+          <span class="settings-panel-hint">Choose the background and accent glow.</span>
+        </div>
+        <span class="active-swatch"><i class="active-swatch-dot"></i><span id="activeBackgroundName"></span></span>
+      </div>
+      <div class="background-options" id="backgroundOptions"></div>
+    </section>
+
+    <section class="settings-panel" aria-labelledby="taskbarHeading">
+      <div class="settings-panel-heading">
+        <div>
+          <h2 id="taskbarHeading">Taskbar layout</h2>
+          <span class="settings-panel-hint">Choose how the site navigation is arranged.</span>
+        </div>
+      </div>
+      <div class="settings-choice-grid">
+        <button type="button" class="nav-option-btn" data-navigation="vertical">
+          <span class="settings-choice-icon">▥</span>
+          <span class="settings-choice-copy"><strong>Sidebar</strong><small>Navigation stays on the left.</small></span>
+        </button>
+        <button type="button" class="nav-option-btn" data-navigation="horizontal">
+          <span class="settings-choice-icon">▬</span>
+          <span class="settings-choice-copy"><strong>Top taskbar</strong><small>Navigation runs across the top.</small></span>
+        </button>
+      </div>
+    </section>
+
+    <section class="settings-panel" aria-labelledby="motionHeading">
+      <div class="settings-panel-heading">
+        <div>
+          <h2 id="motionHeading">Motion</h2>
+          <span class="settings-panel-hint">Tune page transitions and ambient effects.</span>
+        </div>
+      </div>
+      <div class="anim-level-options">
+        <button type="button" class="anim-level-btn" data-animation="full"><span class="anim-level-icon">✦</span><span class="anim-level-name">Full</span><span class="settings-panel-hint">All effects enabled.</span></button>
+        <button type="button" class="anim-level-btn" data-animation="reduced"><span class="anim-level-icon">◌</span><span class="anim-level-name">Reduced</span><span class="settings-panel-hint">Keep the atmosphere calmer.</span></button>
+        <button type="button" class="anim-level-btn" data-animation="off"><span class="anim-level-icon">—</span><span class="anim-level-name">Off</span><span class="settings-panel-hint">Disable decorative motion.</span></button>
+      </div>
+    </section>
+
+    <section class="settings-panel" aria-labelledby="identityHeading">
+      <div class="settings-panel-heading">
+        <div>
+          <h2 id="identityHeading">Site identity</h2>
+          <span class="settings-panel-hint">Optional custom title and favicon URL.</span>
+        </div>
+      </div>
+      <div class="identity-form">
+        <label><span>Site name</span><input id="siteName" type="text" maxlength="60" placeholder="Kermit (RTPK) Network"></label>
+        <label><span>Icon URL</span><input id="siteIcon" type="url" placeholder="https://example.com/icon.png"></label>
+        <div class="identity-actions"><button type="button" class="settings-save-btn" id="saveIdentity">Save</button><button type="button" class="settings-reset-btn" id="resetIdentity">Reset</button></div>
+      </div>
+    </section>
+
+    <section class="settings-panel" aria-labelledby="cloakHeading">
+      <div class="settings-panel-heading">
+        <div>
+          <h2 id="cloakHeading">Cloak launch</h2>
+          <span class="settings-panel-hint">Pick the tab style used by the launch control.</span>
+        </div>
+      </div>
+      <div class="settings-choice-grid">
+        <button type="button" class="cloak-option-btn" data-cloak="none"><strong>Normal tab</strong><small>Open the current site normally.</small></button>
+        <button type="button" class="cloak-option-btn" data-cloak="blob"><strong>Blob tab</strong><small>Open a temporary blob URL.</small></button>
+        <button type="button" class="cloak-option-btn" data-cloak="aboutblank"><strong>Blank tab</strong><small>Open inside an about:blank tab.</small></button>
+      </div>
+    </section>
+    <div class="settings-action-row"><p class="settings-status" id="settingsStatus" role="status" aria-live="polite"></p></div>
   </main>
 </body>
 </html>
